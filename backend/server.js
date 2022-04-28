@@ -37,6 +37,7 @@ const errorHandler = (error) => {
   }
 };
 
+/*
 const https = require("https");
 const fs = require("fs");
 
@@ -46,6 +47,9 @@ const options = {
 };
 
 const server = https.createServer(options, app);
+*/
+const http = require("http");
+const server = http.createServer(app);
 
 server.on("error", errorHandler);
 
@@ -56,3 +60,12 @@ server.on("listening", () => {
 });
 
 server.listen(port);
+
+const CORS = require("cors");
+
+app.use(
+  CORS({
+    origin: "http://localhost:4200",
+    credentials: true,
+  })
+);
