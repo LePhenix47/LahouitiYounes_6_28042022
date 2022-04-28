@@ -5,10 +5,10 @@ const app = express();
 const userRoutes = require("./routes/user");
 
 mongoose
-  .connect(
-    "mongodb+srv://YounesLahouiti2:DeezNuts420@clusterdb-projet-exo.6onu6.mongodb.net/DBsauce?retryWrites=true&w=majority",
-    { useNewUrlParser: true, useUnifiedTopology: true }
-  )
+  .connect(process.env.DB_CONNEXION_URL_LINK, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     console.log("Connexion réussie!!");
   })
