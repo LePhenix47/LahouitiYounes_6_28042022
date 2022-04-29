@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 exports.signup = (req, res, next) => {
   bcrypt
-    .hash(req.bodypassword, 15)
+    .hash(req.body.password, 15)
     .then((hash) => {
       const newUser = new User({
         email: req.body.email,

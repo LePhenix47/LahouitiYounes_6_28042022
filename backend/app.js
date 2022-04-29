@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
 const dotEnv = require("dotenv");
+
+const bodyParser = require("body-parser");
 dotEnv.config();
 
 const app = express();
@@ -32,10 +34,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(helmet());
 
-app.use("api/auth", userRoutes);
+app.use("/api/auth", userRoutes);
 
 module.exports = app;
