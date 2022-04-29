@@ -4,7 +4,6 @@
   "description": "Code Back-End du 6ème projet d'OpenClassroom",
   "main": "server.js",
   "scripts": {
-    "start": "node -r dotenv/config app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Younes LAHOUITI",

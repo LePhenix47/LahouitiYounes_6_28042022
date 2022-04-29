@@ -60,7 +60,7 @@ server.on("listening", () => {
 });
 
 server.listen(port);
-
+/*
 const CORS = require("cors");
 
 app.use(
@@ -69,3 +69,4 @@ app.use(
     credentials: true,
   })
 );
+*/

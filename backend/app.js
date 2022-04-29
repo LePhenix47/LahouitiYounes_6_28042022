@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
+const dotEnv = require("dotenv");
+dotEnv.config();
 
 const app = express();
 const userRoutes = require("./routes/user");
@@ -13,8 +15,8 @@ mongoose
   .then(() => {
     console.log("Connexion réussie!!");
   })
-  .catch(() => {
-    console.log("Connexion ÉCHOUÉE!!");
+  .catch((error) => {
+    console.log("Connexion ÉCHOUÉE!!" + " \nErreur: " + error);
   });
 
 app.use((req, res, next) => {
