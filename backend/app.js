@@ -2,12 +2,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
 const dotEnv = require("dotenv");
+const path = require("path");
 
 const bodyParser = require("body-parser");
 dotEnv.config();
 
 const app = express();
-const userRoutes = require("./routes/user");
 
 mongoose
   .connect(process.env.DB_CONNEXION_URL_LINK, {
@@ -40,6 +40,12 @@ app.use(express.json());
 
 app.use(helmet());
 
+const userRoutes = require("./routes/user");
+const sauceRoutes = require("./routes/sauce");
+
 app.use("/api/auth", userRoutes);
+app.use("api/sauce", sauceRoutes);
+
+app.use("images", express.static(path.join(__dirname, "images")));
 
 module.exports = app;
