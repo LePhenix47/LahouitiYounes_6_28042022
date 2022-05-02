@@ -39,6 +39,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(helmet());
+app.use(helmet({ crossOriginEmbedderPolicy: true }));
+app.use(helmet({ crossOriginResourcePolicy: { policy: "same-site" } }));
 
 const userRoutes = require("./routes/user");
 const sauceRoutes = require("./routes/sauce");

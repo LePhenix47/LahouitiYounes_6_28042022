@@ -21,7 +21,7 @@ exports.getOneSauce = (req, res, next) => {
     _id: req.params.id,
   })
     .then((sauce) => {
-      res.status(200).json({ sauce });
+      res.status(200).json(sauce);
     })
     .catch((error) => {
       console.log(
@@ -95,6 +95,7 @@ exports.deleteSauce = (req, res, next) => {
     }
     Sauce.deleteOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
       .then(() => {
+        console.log("Sauce" + sauce + " SUCCESSFULLY deleted");
         res.status(200).json({ message: "Sauce SUCCESSFULLY deleted" });
       })
       .catch((error) => {
