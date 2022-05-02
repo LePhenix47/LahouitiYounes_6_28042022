@@ -3,6 +3,7 @@ const Sauce = require("../models/Sauce");
 exports.getAllSauces = (req, res, next) => {
   Sauce.find()
     .then((sauces) => {
+      console.log("SUCCESS trying to find sauces" + sauces);
       res.status(200).json({ sauces });
     })
     .catch((error) => {
@@ -41,12 +42,17 @@ exports.createSauce = (req, res, next) => {
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
       req.file.filename
     }`,
+    likes: 0,
+    dislikes: 0,
+    usersLiked: [],
+    usersDisliked: [],
   });
   newSauce
     .save()
-    .then(() =>
-      res.status(201).json({ message: "Sauce object SUCCESSFULLY created!" })
-    )
+    .then(() => {
+      console.log("Sauce SUCCESSFULLY created");
+      res.status(201).json({ message: "Sauce object SUCCESSFULLY created!" });
+    })
     .catch((error) => {
       console.log("Error after creating the sauce object: " + error);
       res.status(400).json({ error });
@@ -95,4 +101,8 @@ exports.deleteSauce = (req, res, next) => {
   });
 };
 
-exports.likeSauce = (req, res, next) => {};
+exports.likeSauce = (req, res, next) => {
+  Sauce.findOne({
+    _id: req.params.id,
+  });
+};
