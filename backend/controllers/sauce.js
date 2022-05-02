@@ -1,9 +1,9 @@
 const Sauce = require("../models/Sauce");
 
-exports.getAllSauces = (req, res) => {
+exports.getAllSauces = (req, res, next) => {
   Sauce.find()
     .then((sauces) => {
-      res.status(200).json(sauces);
+      res.status(200).json({ sauces });
     })
     .catch((error) => {
       console.log("Error after trying to fetch all the sauces: " + error);
@@ -13,7 +13,7 @@ exports.getAllSauces = (req, res) => {
     });
 };
 
-exports.getOneSauce = (req, res) => {
+exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({
     _id: req.params.id,
   })
@@ -33,50 +33,54 @@ exports.getOneSauce = (req, res) => {
     });
 };
 
-exports.createSauce = (req, res) => {
+exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
-  const thing = new Thing({
+  const newSauce = new Sauce({
     ...sauceObject,
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
       req.file.filename
     }`,
   });
-  thing
+  newSauce
     .save()
-    .then(() => res.status(201).json({ message: "Objet enregistré !" }))
+    .then(() =>
+      res.status(201).json({ message: "Sauce object SUCCESSFULLY created!" })
+    )
     .catch((error) => {
-      console.log("Error after creating the object: " + error);
+      console.log("Error after creating the sauce object: " + error);
       res.status(400).json({ error });
     });
 };
 
-exports.modifySauce = (req, res) => {
-  Sauce.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
-    .then((sauce) => {
-      if (sauce.userId === req.auth.userId) {
-        console.log("The user IDs do not match");
-        return res.status(401).json({ error: new Error("Forbidden request") });
+exports.modifySauce = (req, res, next) => {
+  const sauceObject = req.file
+    ? {
+        ...JSON.parse(req.body.sauce),
+        imageUrl: `${req.protocol}://${req.get("host")}/images/${
+          req.file.filename
+        }`,
       }
-      res.status(200).json({ message: "Sauce SUCCESSFULLY modified" });
-    })
-    .catch((error) => {
-      console.log(
-        "Error found while attempting to modify  the sauce: " + error
-      );
-      res.status(400).json({ error });
-    });
+    : { ...req.body };
+  Sauce.updateOne(
+    { _id: req.params.id },
+    { ...sauceObject, _id: req.params.id }
+  )
+    .then(() =>
+      res.status(200).json({ message: "Sauce Object SUCCESSFULLY modified !" })
+    )
+    .catch((error) => res.status(400).json({ error }));
 };
 
-exports.deleteSauce = (req, res) => {
+exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     if (!sauce) {
       console.log("The sauce is not registered in the database");
       return res.status(404).json({ error: new Error("Sauce not found") });
     }
-    if (sauce.userId === req.auth.userId) {
+    if (sauce.userId !== req.auth.userId) {
       console.log("The user IDs do not match");
-      return res.status(401).json({ error: new Error("Forbidden request") });
+      return res.status(403).json({ error: new Error("Forbidden request") });
     }
     Sauce.deleteOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
       .then(() => {
@@ -91,4 +95,4 @@ exports.deleteSauce = (req, res) => {
   });
 };
 
-exports.likeSauce = (req, res) => {};
+exports.likeSauce = (req, res, next) => {};
