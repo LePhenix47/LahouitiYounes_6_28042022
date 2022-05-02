@@ -1,10 +1,11 @@
 const Sauce = require("../models/Sauce");
 
+//Controlleur pour récupérer TOUTES les sauces dans la base de données
 exports.getAllSauces = (req, res, next) => {
   Sauce.find()
     .then((sauces) => {
       console.log("SUCCESS trying to find sauces" + sauces);
-      res.status(200).json({ sauces });
+      res.status(200).json(sauces);
     })
     .catch((error) => {
       console.log("Error after trying to fetch all the sauces: " + error);
@@ -14,6 +15,7 @@ exports.getAllSauces = (req, res, next) => {
     });
 };
 
+//Controlleur pour récupérer une sauce à partir de son ID dans l'URL
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({
     _id: req.params.id,
@@ -34,6 +36,7 @@ exports.getOneSauce = (req, res, next) => {
     });
 };
 
+//Controlleur pour créer une sauce
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
@@ -59,6 +62,7 @@ exports.createSauce = (req, res, next) => {
     });
 };
 
+//Controlleur pour modifier une sauce
 exports.modifySauce = (req, res, next) => {
   const sauceObject = req.file
     ? {
@@ -78,6 +82,7 @@ exports.modifySauce = (req, res, next) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
+//Controlleur pour supprimer une sauce
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     if (!sauce) {
@@ -101,8 +106,31 @@ exports.deleteSauce = (req, res, next) => {
   });
 };
 
+//Controlleur pour le like d'une sauce
 exports.likeSauce = (req, res, next) => {
   Sauce.findOne({
     _id: req.params.id,
   });
+  /*
+  switch (){
+        case: //Où on like
+    break;
+
+        case:
+    break;
+
+        case: //Où on enlève le like
+    break;
+
+      case: //Où on dislike
+    break;
+
+        case:
+    break;
+
+        case: //Où on enlève le dislike
+    break;
+    default: 
+  }
+ }*/
 };
