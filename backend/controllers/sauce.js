@@ -153,6 +153,7 @@ exports.likeSauce = (req, res, next) => {
       let usersDislikedArray = sauce.usersDisliked;
 
       let userLikedOrDisliked = req.body.like;
+
       console.log(
         "Number of likes for the sauce : " +
           sauce.name +
@@ -165,11 +166,13 @@ exports.likeSauce = (req, res, next) => {
       /*
 
 function findUserIdInArray (array, userId){
- for(cell of array){
-   if(cell.userId === userId){
-     return true;
+  if(array.length > 0){
+    for(cell of array){
+      if(cell.userId === userId){
+        return true;
+     }
    }
- }
+  }
  return false;
 }
 
@@ -179,11 +182,11 @@ function findUserIdInArray (array, userId){
 
         if(findUserIdInArray(usersLikedArray, userId)){
           console.log("User ID: " + userId + " found in the usersLikedArray → Like cancelled");
-        usersLikedArray.removeToSet(userId); //marche comme le pop() sur JS
+              Sauce.updateOne(...sauceObject {$pop: { usersLiked: userId} }); //marche comme le pop() sur JS
         numberOfLikes = usersLikedArray.length;
         }else{
         console.log("User ID: " + userId + " has NOT been found in the array of userIDs → Like added");
-        usersLikedArray.addToSet(userId); //marche comme le push() sur JS
+         Sauce.updateOne(...sauceObject {$push: { usersLiked: userId} }); //marche comme le push() sur JS
         numberOfLikes = usersLikedArray.length;
         }
         
@@ -193,16 +196,16 @@ function findUserIdInArray (array, userId){
 
         if(findUserId(usersDislikedArray, userId)){
         console.log("User ID: " + userId + " found in the usersDislikedArray → Dislike cancelled");
-        usersDislikedArray.removeToSet(userId);
+            Sauce.updateOne(...sauceObject {$pop: { usersDisliked: userId} }); //marche comme le pop() sur JS
         numberOfLikes = usersLikedArray.length;
         }else{
         console.log("User ID: " + userId + " has NOT been found in the array of userIDs → Dislike added");
-        usersDislikedArray.addToSet(userId);
+        Sauce.updateOne(  { _id: req.params.id },{$push: { usersDisliked: userId} }); //marche comme le push() sur JS
         numberOfLikes = usersLikedArray.length;
         }        
     break;
 
-    default 0: //Pas de likes AJOUTÉS par défaut 
+    default : 0 //Pas de likes/dislikes AJOUTÉS par défaut 
     console.log("Error while attempting to like/dislike")
   }
  }
