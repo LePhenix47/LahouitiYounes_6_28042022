@@ -5,7 +5,7 @@ const fileSystem = require("fs");
 exports.getAllSauces = (req, res, next) => {
   Sauce.find()
     .then((sauces) => {
-      console.log("SUCCESS trying to find sauces" + sauces);
+      console.log("SUCCESS trying to find sauces: " + sauces);
       res.status(200).json(sauces);
     })
     .catch((error) => {
@@ -119,27 +119,84 @@ exports.deleteSauce = (req, res, next) => {
 exports.likeSauce = (req, res, next) => {
   Sauce.findOne({
     _id: req.params.id,
-  });
-  /*
-  switch (){
-        case: //Où on like
+  })
+    .then((sauce) => {
+      let userId = sauce.userId;
+      let numberOfLikes = sauce.likes;
+      let numberOfDislikes = sauce.dislikes;
+      let usersLikedArray = sauce.usersLiked;
+      let usersDislikedArray = sauce.usersDisliked;
+
+      let userLikedOrDisliked = req.body.like;
+      console.log(
+        "Number of likes for the sauce : " +
+          sauce.name +
+          " is = " +
+          userLikedOrDisliked +
+          " and likes saved in the database: " +
+          numberOfLikes
+      );
+
+      /*
+
+function findUserId  (array, userId){
+  return array.find(
+    (sauceInArray)=>{
+      sauceInArray.userId === userId;
+    }
+  )
+}
+
+
+  switch (userLikedOrDisliked){
+        case 1: //Où on like
+        findUserIdInArray(usersLikedArray, userId) = undefined ? 
+        console.log("User ID: " + userId + " found in the usersLikedArray → Like cancelled")
+        usersLikedArray.removeToSet(userId);
+        numberOfLikes = usersLikedArray.length;
+        :  
+          console.log("User ID: " + userId + " has NOT been found in the array of userIDs → Like added")
+        usersLikedArray.addToSet(userId);
+        numberOfLikes = usersLikedArray.length;
+        ;
+        
     break;
 
-        case:
+        case -1: //Où on dislike
+         findUserId(usersDislikedArray, userId) ? 
+        console.log("User ID: " + userId + " found in the usersDislikedArray → Dislike cancelled")
+        usersDislikedArray.removeToSet(userId);
+        numberOfLikes = usersLikedArray.length;
+        :  
+          console.log("User ID: " + userId + " has NOT been found in the array of userIDs → Dislike added")
+        usersDislikedArray.addToSet(userId);
+        numberOfLikes = usersLikedArray.length;
+        ;
+        
     break;
 
-        case: //Où on enlève le like
-    break;
-
-      case: //Où on dislike
-    break;
-
-        case:
-    break;
-
-        case: //Où on enlève le dislike
-    break;
-    default: 
+    default 0: //Pas de likes AJOUTÉS par défaut 
   }
- }*/
+ }
+ 
+
+ Sauce.updateOne(
+    { _id: req.params.id },
+    { ...sauceObject, _id: req.params.id }
+  ).then(
+    ()=>{
+      res.status(200).json({message: "Sauce object SUCCESSFULLY liked/disliked"})
+    }
+  ).catch(
+    (error)=>{
+      res.status(500).json({error});
+    }
+  )
+ 
+ */
+    })
+    .catch((error) => {
+      console.log("Error while attempting to find the sauce: " + error);
+      res.status(404).json({ error });
+    });
 };
