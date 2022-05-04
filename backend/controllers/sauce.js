@@ -1,11 +1,13 @@
 const Sauce = require("../models/Sauce");
 const fileSystem = require("fs");
 
+/*
 //Controlleur pour récupérer TOUTES les sauces dans la base de données
+*/
 exports.getAllSauces = (req, res, next) => {
   Sauce.find()
     .then((sauces) => {
-      console.log("SUCCESS trying to find sauces: " + sauces);
+      console.log("SUCCESS trying to find sauces! ");
       res.status(200).json(sauces);
     })
     .catch((error) => {
@@ -16,7 +18,9 @@ exports.getAllSauces = (req, res, next) => {
     });
 };
 
+/*
 //Controlleur pour récupérer une sauce à partir de son ID dans l'URL
+*/
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({
     _id: req.params.id,
@@ -37,7 +41,9 @@ exports.getOneSauce = (req, res, next) => {
     });
 };
 
+/*
 //Controlleur pour créer une sauce
+*/
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
@@ -63,8 +69,23 @@ exports.createSauce = (req, res, next) => {
     });
 };
 
+/*
 //Controlleur pour modifier une sauce
+*/
 exports.modifySauce = (req, res, next) => {
+  let oldImageUrl = undefined;
+  let filename = undefined;
+
+  Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+    console.log(sauce);
+    oldImageUrl = sauce.imageUrl;
+    filename = oldImageUrl.split("/images")[1];
+    console.log("-------------------Old image URL " + oldImageUrl);
+
+    fileSystem.unlink(`images/${filename}`, () => {
+      console.log("OLD Image with url: " + filename + " successfully deleted");
+    });
+  });
   const sauceObject = req.file
     ? {
         ...JSON.parse(req.body.sauce),
@@ -83,7 +104,9 @@ exports.modifySauce = (req, res, next) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
+/*
 //Controlleur pour supprimer une sauce
+*/
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     if (!sauce) {
@@ -115,7 +138,9 @@ exports.deleteSauce = (req, res, next) => {
   });
 };
 
-//Controlleur pour le like d'une sauce
+/*
+//Controlleur pour le like/dislike d'une sauce
+*/
 exports.likeSauce = (req, res, next) => {
   Sauce.findOne({
     _id: req.params.id,
@@ -140,24 +165,25 @@ exports.likeSauce = (req, res, next) => {
       /*
 
 function findUserIdInArray (array, userId){
-  return array.find(
-    (sauceInArray)=>{
-      sauceInArray.userId === userId;
-    }
-  )
+ for(cell of array){
+   if(cell.userId === userId){
+     return true;
+   }
+ }
+ return false;
 }
 
 
   switch (userLikedOrDisliked){
         case 1: //Où on like
 
-        if(findUserIdInArray(usersLikedArray, userId) === undefined){
+        if(findUserIdInArray(usersLikedArray, userId)){
           console.log("User ID: " + userId + " found in the usersLikedArray → Like cancelled");
-        usersLikedArray.removeToSet(userId);
+        usersLikedArray.removeToSet(userId); //marche comme le pop() sur JS
         numberOfLikes = usersLikedArray.length;
         }else{
         console.log("User ID: " + userId + " has NOT been found in the array of userIDs → Like added");
-        usersLikedArray.addToSet(userId);
+        usersLikedArray.addToSet(userId); //marche comme le push() sur JS
         numberOfLikes = usersLikedArray.length;
         }
         
@@ -165,7 +191,7 @@ function findUserIdInArray (array, userId){
 
         case -1: //Où on dislike
 
-        if(findUserId(usersDislikedArray, userId) === undefined){
+        if(findUserId(usersDislikedArray, userId)){
         console.log("User ID: " + userId + " found in the usersDislikedArray → Dislike cancelled");
         usersDislikedArray.removeToSet(userId);
         numberOfLikes = usersLikedArray.length;
