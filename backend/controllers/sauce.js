@@ -1,4 +1,5 @@
 const Sauce = require("../models/Sauce");
+const fileSystem = require("fs");
 
 //Controlleur pour récupérer TOUTES les sauces dans la base de données
 exports.getAllSauces = (req, res, next) => {
@@ -93,17 +94,24 @@ exports.deleteSauce = (req, res, next) => {
       console.log("The user IDs do not match");
       return res.status(403).json({ error: new Error("Forbidden request") });
     }
-    Sauce.deleteOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
-      .then(() => {
-        console.log("Sauce" + sauce + " SUCCESSFULLY deleted");
-        res.status(200).json({ message: "Sauce SUCCESSFULLY deleted" });
-      })
-      .catch((error) => {
-        console.log(
-          "Error found while attempting to delete the sauce: " + error
-        );
-        res.status(400).json({ error });
-      });
+
+    const filename = sauce.imageUrl.split("/images")[1];
+    fileSystem.unlink(`images/${filename}`, () => {
+      Sauce.deleteOne(
+        { _id: req.params.id },
+        { ...req.body, _id: req.params.id }
+      )
+        .then(() => {
+          console.log("Sauce" + sauce + " SUCCESSFULLY deleted");
+          res.status(200).json({ message: "Sauce SUCCESSFULLY deleted" });
+        })
+        .catch((error) => {
+          console.log(
+            "Error found while attempting to delete the sauce: " + error
+          );
+          res.status(400).json({ error });
+        });
+    });
   });
 };
 
