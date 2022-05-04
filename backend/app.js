@@ -38,10 +38,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use("images", express.static(path.join(__dirname, "images")));
-app.use(helmet());
-app.use(helmet({ crossOriginEmbedderPolicy: true }));
-app.use(helmet({ crossOriginResourcePolicy: { policy: "same-site" } }));
+app.use("images", express.static(path.join(__dirname, "/images")));
+
+//app.use(helmet({ crossOriginEmbedderPolicy: false }));
 
 const userRoutes = require("./routes/user");
 const sauceRoutes = require("./routes/sauce");

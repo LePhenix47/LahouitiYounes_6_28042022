@@ -141,6 +141,8 @@ exports.deleteSauce = (req, res, next) => {
 /*
 //Controlleur pour le like/dislike d'une sauce
 */
+const findIndexInArray = require("../utils/likeSauce-function");
+
 exports.likeSauce = (req, res, next) => {
   Sauce.findOne({
     _id: req.params.id,
@@ -153,78 +155,132 @@ exports.likeSauce = (req, res, next) => {
       let usersDislikedArray = sauce.usersDisliked;
 
       let userLikedOrDisliked = req.body.like;
-
-      console.log(
-        "Number of likes for the sauce : " +
-          sauce.name +
-          " is = " +
-          userLikedOrDisliked +
-          " and likes saved in the database: " +
-          numberOfLikes
-      );
-
-      /*
-
-function findUserIdInArray (array, userId){
-  if(array.length > 0){
-    for(cell of array){
-      if(cell.userId === userId){
-        return true;
-     }
-   }
-  }
- return false;
-}
-
-
-  switch (userLikedOrDisliked){
-        case 1: //Où on like
-
-        if(findUserIdInArray(usersLikedArray, userId)){
-          console.log("User ID: " + userId + " found in the usersLikedArray → Like cancelled");
-              Sauce.updateOne(...sauceObject {$pop: { usersLiked: userId} }); //marche comme le pop() sur JS
-        numberOfLikes = usersLikedArray.length;
-        }else{
-        console.log("User ID: " + userId + " has NOT been found in the array of userIDs → Like added");
-         Sauce.updateOne(...sauceObject {$push: { usersLiked: userId} }); //marche comme le push() sur JS
-        numberOfLikes = usersLikedArray.length;
+      console.log("Valeur de likes dans B2D: ", userLikedOrDisliked);
+      switch (userLikedOrDisliked) {
+        case 1: {
+          //Où on like
+          let indexFound = findIndexInArray(usersLikedArray, userId);
+          if (indexFound > -1) {
+            console.log(
+              "User ID: " +
+                userId +
+                " found in the usersLikedArray → Like cancelled"
+            );
+            usersLikedArray.splice(indexFound, 1);
+          } else {
+            console.log(
+              "User ID: " +
+                userId +
+                " has NOT been found in the array of userIDs → Like added"
+            );
+            usersLikedArray.push(userId);
+          }
+          numberOfLikes = usersLikedArray.length;
+          let sauceObject = {
+            ...JSON.parse(JSON.stringify(sauce)),
+            usersLiked: usersLikedArray,
+            likes: numberOfLikes,
+          };
+          Sauce.updateOne(
+            { _id: req.params.id },
+            { ...sauceObject, _id: req.params.id }
+          )
+            .then(() =>
+              res
+                .status(200)
+                .json({ message: "Sauce Object SUCCESSFULLY modified !" })
+            )
+            .catch((error) => res.status(400).json({ error }));
+          break;
         }
-        
-    break;
 
-        case -1: //Où on dislike
+        //
+        case -1: {
+          //Où on like
+          let indexFound = findIndexInArray(usersDislikedArray, userId);
+          if (indexFound > -1) {
+            console.log(
+              "User ID: " +
+                userId +
+                " found in the usersLikedArray → Like cancelled"
+            );
+            usersDislikedArray.splice(indexFound, 1);
+          } else {
+            console.log(
+              "User ID: " +
+                userId +
+                " has NOT been found in the array of userIDs → Like added"
+            );
+            usersDislikedArray.push(userId);
+          }
+          numberOfDislikes = usersDislikedArray.length;
+          let sauceObject = {
+            ...JSON.parse(JSON.stringify(sauce)),
+            usersDisliked: usersDislikedArray,
+            dislikes: numberOfDislikes,
+          };
+          Sauce.updateOne(
+            { _id: req.params.id },
+            { ...sauceObject, _id: req.params.id }
+          )
+            .then(() =>
+              res
+                .status(200)
+                .json({ message: "Sauce Object SUCCESSFULLY modified !" })
+            )
+            .catch((error) => res.status(400).json({ error }));
+          break;
+        }
 
-        if(findUserId(usersDislikedArray, userId)){
-        console.log("User ID: " + userId + " found in the usersDislikedArray → Dislike cancelled");
-            Sauce.updateOne(...sauceObject {$pop: { usersDisliked: userId} }); //marche comme le pop() sur JS
-        numberOfLikes = usersLikedArray.length;
-        }else{
-        console.log("User ID: " + userId + " has NOT been found in the array of userIDs → Dislike added");
-        Sauce.updateOne(  { _id: req.params.id },{$push: { usersDisliked: userId} }); //marche comme le push() sur JS
-        numberOfLikes = usersLikedArray.length;
-        }        
-    break;
+        case 0: {
+          let index = findIndexInArray(usersLikedArray, userId);
+          if (index > -1) {
+            usersLikedArray.splice(index, 1);
+            numberOfLikes = usersLikedArray.length;
+            let sauceObject = {
+              ...JSON.parse(JSON.stringify(sauce)),
+              usersLiked: usersLikedArray,
+              likes: numberOfLikes,
+            };
+            Sauce.updateOne(
+              { _id: req.params.id },
+              { ...sauceObject, _id: req.params.id }
+            )
+              .then(() =>
+                res
+                  .status(200)
+                  .json({ message: "Sauce Object SUCCESSFULLY modified !" })
+              )
+              .catch((error) => res.status(400).json({ error }));
+          } else {
+            index = findIndexInArray(usersDislikedArray, userId);
+            if (index > -1) {
+              usersDislikedArray.splice(index, 1);
+              numberOfDislikes = usersDislikedArray.length;
+              let sauceObject = {
+                ...JSON.parse(JSON.stringify(sauce)),
+                usersDisliked: usersDislikedArray,
+                dislikes: numberOfDislikes,
+              };
+              Sauce.updateOne(
+                { _id: req.params.id },
+                { ...sauceObject, _id: req.params.id }
+              )
+                .then(() =>
+                  res
+                    .status(200)
+                    .json({ message: "Sauce Object SUCCESSFULLY modified !" })
+                )
+                .catch((error) => res.status(400).json({ error }));
+            }
+          }
 
-    default : 0 //Pas de likes/dislikes AJOUTÉS par défaut 
-    console.log("Error while attempting to like/dislike")
-  }
- }
- 
+          break;
+        }
 
- Sauce.updateOne(
-    { _id: req.params.id },
-    { ...sauceObject, _id: req.params.id }
-  ).then(
-    ()=>{
-      res.status(200).json({message: "Sauce object SUCCESSFULLY liked/disliked"})
-    }
-  ).catch(
-    (error)=>{
-      res.status(500).json({error});
-    }
-  )
- 
- */
+        default: //Pas de likes/dislikes AJOUTÉS par défaut
+          break;
+      }
     })
     .catch((error) => {
       console.log("Error while attempting to find the sauce: " + error);
