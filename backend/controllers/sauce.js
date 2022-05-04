@@ -139,7 +139,7 @@ exports.likeSauce = (req, res, next) => {
 
       /*
 
-function findUserId  (array, userId){
+function findUserIdInArray (array, userId){
   return array.find(
     (sauceInArray)=>{
       sauceInArray.userId === userId;
@@ -150,32 +150,34 @@ function findUserId  (array, userId){
 
   switch (userLikedOrDisliked){
         case 1: //Où on like
-        findUserIdInArray(usersLikedArray, userId) = undefined ? 
-        console.log("User ID: " + userId + " found in the usersLikedArray → Like cancelled")
+
+        if(findUserIdInArray(usersLikedArray, userId) === undefined){
+          console.log("User ID: " + userId + " found in the usersLikedArray → Like cancelled");
         usersLikedArray.removeToSet(userId);
         numberOfLikes = usersLikedArray.length;
-        :  
-          console.log("User ID: " + userId + " has NOT been found in the array of userIDs → Like added")
+        }else{
+        console.log("User ID: " + userId + " has NOT been found in the array of userIDs → Like added");
         usersLikedArray.addToSet(userId);
         numberOfLikes = usersLikedArray.length;
-        ;
+        }
         
     break;
 
         case -1: //Où on dislike
-         findUserId(usersDislikedArray, userId) ? 
-        console.log("User ID: " + userId + " found in the usersDislikedArray → Dislike cancelled")
+
+        if(findUserId(usersDislikedArray, userId) === undefined){
+        console.log("User ID: " + userId + " found in the usersDislikedArray → Dislike cancelled");
         usersDislikedArray.removeToSet(userId);
         numberOfLikes = usersLikedArray.length;
-        :  
-          console.log("User ID: " + userId + " has NOT been found in the array of userIDs → Dislike added")
+        }else{
+        console.log("User ID: " + userId + " has NOT been found in the array of userIDs → Dislike added");
         usersDislikedArray.addToSet(userId);
         numberOfLikes = usersLikedArray.length;
-        ;
-        
+        }        
     break;
 
     default 0: //Pas de likes AJOUTÉS par défaut 
+    console.log("Error while attempting to like/dislike")
   }
  }
  
