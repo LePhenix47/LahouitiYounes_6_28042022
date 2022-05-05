@@ -142,7 +142,7 @@ exports.likeSauce = (req, res, next) => {
             _id: req.params.id,
         })
         .then((sauce) => {
-            let userId = sauce.userId;
+            let userId = req.body.userId;
             let numberOfLikes = sauce.likes;
             let numberOfDislikes = sauce.dislikes;
             let usersLikedArray = sauce.usersLiked;
