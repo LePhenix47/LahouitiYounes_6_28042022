@@ -4,25 +4,44 @@ const jwt = require("jsonwebtoken");
 
 exports.signup = (req, res, next) => {
     console.log(req.body.email);
-    bcrypt
-        .hash(req.body.password, 15)
-        .then((hash) => {
-            const newUser = new User({
-                email: req.body.email,
-                password: hash,
-            });
+    User.findOne({ email: req.body.email })
+        .then((user) => {
+            if (!user) {
+                console.log("User not registered in Database: " + user);
+                bcrypt
+                    .hash(req.body.password, 15)
+                    .then((hash) => {
+                        const newUser = new User({
+                            email: req.body.email,
+                            password: hash,
+                        });
 
-            newUser
-                .save(console.log(newUser))
-                .then(() =>
-                    res.status(201).json({ message: "User SUCCESSFULLY created!" })
-                )
-                .catch((error) => {
-                    res.status(400).json({ error });
-                    console.log(error);
+                        newUser
+                            .save(console.log(newUser))
+                            .then(() =>
+                                res.status(201).json({ message: "User SUCCESSFULLY created!" })
+                            )
+                            .catch((error) => {
+                                res.status(400).json({ error });
+                                console.log(error);
+                            });
+                    })
+                    .catch((error) => {
+                        res.status(500).json({ error });
+                    });
+            } else {
+                console.log(
+                    "User with the email: " +
+                    req.body.email +
+                    " has already an account registered in the DB"
+                );
+                res.status(401).json({
+                    message: "User already signed up with this email (" + req.body.email + ")",
                 });
+            }
         })
         .catch((error) => {
+            console.log("Error 500 after finding user: " + error);
             res.status(500).json({ error });
         });
 };
