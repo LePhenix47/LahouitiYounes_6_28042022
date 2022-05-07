@@ -57,6 +57,7 @@ exports.createSauce = (req, res, next) => {
         usersLiked: [],
         usersDisliked: [],
     });
+    console.log("URL of this new image " + newSauce.imageUrl);
     newSauce
         .save()
         .then(() => {
@@ -74,18 +75,31 @@ exports.createSauce = (req, res, next) => {
 */
 exports.modifySauce = (req, res, next) => {
     let oldImageUrl = undefined;
-    let filename = undefined;
+    let oldFilename = undefined;
+    let newImageUrl = undefined;
 
     Sauce.findOne({ _id: req.params.id }).then((sauce) => {
         console.log(sauce);
         oldImageUrl = sauce.imageUrl;
-        filename = oldImageUrl.split("/images")[1];
+        oldFilename = oldImageUrl.split("/images")[1];
         console.log("-------------------Old image URL " + oldImageUrl);
 
-        fileSystem.unlink(`images/${filename}`, () => {
-            console.log("OLD Image with url: " + filename + " successfully deleted");
-        });
+        if (req.file) {
+            newImageUrl = req.file.filename;
+
+            let oldImageUri = oldFilename.split("@!Sauce$")[0];
+            let newImageUri = newImageUrl.split("@!Sauce$")[0];
+
+            if (newImageUri !== oldImageUri) {
+                fileSystem.unlink(`images/${oldFilename}`, () => {
+                    console.log(
+                        "OLD Image with uri: " + oldFilename + " successfully deleted"
+                    );
+                });
+            }
+        }
     });
+
     const sauceObject = req.file ?
         {
             ...JSON.parse(req.body.sauce),
